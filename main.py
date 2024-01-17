@@ -1,5 +1,5 @@
 import arcade
-from config import SCREEN_HEIGHT, SCREEN_TITLE, SCREEN_WIDTH, CHARACTER_SCALING, TILE_SCALING
+from config import SCREEN_HEIGHT, SCREEN_TITLE, SCREEN_WIDTH, CHARACTER_SCALING, TILE_SCALING, PLAYER_MOVEMENT_SPEED
 
 class MyGame(arcade.Window):
     def __init__(self):
@@ -9,6 +9,7 @@ class MyGame(arcade.Window):
 
         self.scene = None
         self.player_sprite = None
+        self.physics_engine = None
 
     def setup(self):
         # create Scene
@@ -44,11 +45,37 @@ class MyGame(arcade.Window):
             wall.position = coordinate
             self.scene.add_sprite('Walls', wall)
 
+        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
+                                                         self.scene.get_sprite_list('Walls'))
+
 
     def on_draw(self):
         self.clear()
 
         self.scene.draw()
+
+    def on_update(self, delta_time: float):
+        self.physics_engine.update()
+
+    def on_key_press(self, key: int, modifiers: int):
+        if key == arcade.key.UP or key == arcade.key.W:
+            self.scene.get_sprite_list('Player').move(0.0, PLAYER_MOVEMENT_SPEED)
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.scene.get_sprite_list('Player').move(0.0, -PLAYER_MOVEMENT_SPEED)
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.scene.get_sprite_list('Player').move(PLAYER_MOVEMENT_SPEED, 0.0)
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.scene.get_sprite_list('Player').move(-PLAYER_MOVEMENT_SPEED, 0.0)
+
+    def on_key_release(self, key: int, modifiers: int):
+        if key == arcade.key.UP or key == arcade.key.W:
+            self.scene.get_sprite_list('Player').move(0.0, 0.0)
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.scene.get_sprite_list('Player').move(0.0, 0.0)
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.scene.get_sprite_list('Player').move(0.0, 0.0)
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.scene.get_sprite_list('Player').move(0.0, 0.0)
 
 def main():
     window = MyGame()
