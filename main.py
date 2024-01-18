@@ -1,5 +1,6 @@
 import arcade
 from config import SCREEN_HEIGHT, SCREEN_TITLE, SCREEN_WIDTH, CHARACTER_SCALING, TILE_SCALING, PLAYER_MOVEMENT_SPEED
+import config
 
 class MyGame(arcade.Window):
     def __init__(self):
@@ -45,8 +46,9 @@ class MyGame(arcade.Window):
             wall.position = coordinate
             self.scene.add_sprite('Walls', wall)
 
-        self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
-                                                         self.scene.get_sprite_list('Walls'))
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
+                                                             gravity_constant=config.GRAVITY,
+                                                             walls=self.scene.get_sprite_list('Walls'))
 
 
     def on_draw(self):
@@ -59,9 +61,8 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, key: int, modifiers: int):
         if key == arcade.key.UP or key == arcade.key.W:
-            self.scene.get_sprite_list('Player').move(0.0, PLAYER_MOVEMENT_SPEED)
-        elif key == arcade.key.DOWN or key == arcade.key.S:
-            self.scene.get_sprite_list('Player').move(0.0, -PLAYER_MOVEMENT_SPEED)
+            if self.physics_engine.can_jump():
+                self.scene['Player'].move(0, config.PLAYER_JUMP_SPEED)
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.scene.get_sprite_list('Player').move(PLAYER_MOVEMENT_SPEED, 0.0)
         elif key == arcade.key.LEFT or key == arcade.key.A:
